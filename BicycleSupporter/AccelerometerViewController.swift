@@ -6,3 +6,8 @@
 //
 
 import Foundation
+import CoreMotion
+
+class AccelerometerViewController: UIViewController {
+    let motionManager = CMMotionManager()
+}
