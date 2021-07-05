@@ -9,21 +9,23 @@ import SwiftUI
 import CoreMotion
 
 struct ContentView: View {
-    @ObservedObject var sensor = MotionSensor()
+    @ObservedObject var accelerationSensor = AccelerationSensor()
     var body: some View {
         VStack {
-            Text("time: \(sensor.time)")
+            Text("加速度センサー")
                 .padding()
-            Text("x = \(sensor.xStr)")
+            Text("状態: \(accelerationSensor.state)")
                 .padding()
-            Text("y = \(sensor.yStr)")
+            Text("x = \(accelerationSensor.xStr)")
                 .padding()
-            Text("z = \(sensor.zStr)")
+            Text("y = \(accelerationSensor.yStr)")
+                .padding()
+            Text("z = \(accelerationSensor.zStr)")
                 .padding()
             Button(action: {
-                self.sensor.isStarted ? self.sensor.stop() : self.sensor.start()
+                self.accelerationSensor.isStarted ? self.accelerationSensor.stop() : self.accelerationSensor.start()
             }) {
-                self.sensor.isStarted ? Text("STOP").padding() : Text("START").padding()
+                self.accelerationSensor.isStarted ? Text("STOP").padding() : Text("START").padding()
             }
         }
     }
@@ -35,17 +37,22 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-class MotionSensor: NSObject, ObservableObject {
+class AccelerationSensor: NSObject, ObservableObject {
     @Published var isStarted = false
     @Published var xStr = "0.0"
     @Published var yStr = "0.0"
     @Published var zStr = "0.0"
     @Published var time = 0.0
-    var axisData: [[Double]] = [[0.0, 0.0, 0.0]]
+    @Published var state = "待機中"
+    var startDate = Date()
+    var endDate = Date()
+    var accelerationArrData: [[Double]] = [[Double]]()
     let motionManager = CMMotionManager()
     
     func start() {
+        state = "測定中"
         if motionManager.isDeviceMotionAvailable {
+            startDate = Date()
             motionManager.deviceMotionUpdateInterval = 0.1
             motionManager.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: {(motion:CMDeviceMotion?, error:Error?) in
                 self.updateMotionData(deviceMotion: motion!)
@@ -56,17 +63,43 @@ class MotionSensor: NSObject, ObservableObject {
     }
     
     func stop() {
+        state = "測定終了"
+        endDate = Date()
         isStarted = false
         motionManager.stopDeviceMotionUpdates()
-        print(axisData.count)
-        print(axisData)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
+        let fileName = dateFormatter.string(from: startDate) + "~" + dateFormatter.string(from: endDate)
+        saveToCsv(fileName: fileName, fileArrData: accelerationArrData)
     }
 
     func updateMotionData(deviceMotion: CMDeviceMotion) {
         xStr = String(deviceMotion.userAcceleration.x)
         yStr = String(deviceMotion.userAcceleration.y)
         zStr = String(deviceMotion.userAcceleration.z)
-        axisData.append([atof(xStr), atof(yStr), atof(zStr)])
+        accelerationArrData.append([atof(xStr), atof(yStr), atof(zStr)])
         time += 0.1
+    }
+    
+    //多次元配列からDocuments下にCSVファイルを作る
+    func saveToCsv(fileName : String, fileArrData : [[Double]]){
+        let filePath = NSHomeDirectory() + "/Documents/" + fileName + ".csv"
+        var fileStrData:String = ""
+        //StringのCSV用データを準備
+        for singleArray in fileArrData{
+            for singleString in singleArray{
+                fileStrData += "\"" + String(singleString) + "\""
+                if singleString != singleArray[singleArray.count-1]{
+                    fileStrData += ","
+                }
+            }
+            fileStrData += "\n"
+        }
+        do{
+            try fileStrData.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
+            state = "Success to Wite the File"
+        }catch let error as NSError{
+            state = "Failure to Write File\n\(error)"
+        }
     }
 }
