@@ -14,7 +14,7 @@ struct ContentView: View {
         VStack {
             Text("Accelometer")
                 .padding()
-            Text("state: \(accelerationSensor.state)")
+            Text("status: \(accelerationSensor.state)")
                 .padding()
             Text("x = \(accelerationSensor.xStr)")
                 .padding()
