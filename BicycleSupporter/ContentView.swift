@@ -12,9 +12,9 @@ struct ContentView: View {
     @ObservedObject var accelerationSensor = AccelerationSensor()
     var body: some View {
         VStack {
-            Text("加速度センサー")
+            Text("Accelometer")
                 .padding()
-            Text("状態: \(accelerationSensor.state)")
+            Text("state: \(accelerationSensor.state)")
                 .padding()
             Text("x = \(accelerationSensor.xStr)")
                 .padding()
@@ -43,14 +43,14 @@ class AccelerationSensor: NSObject, ObservableObject {
     @Published var yStr = "0.0"
     @Published var zStr = "0.0"
     @Published var time = 0.0
-    @Published var state = "待機中"
+    @Published var state = "waiting"
     var startDate = Date()
     var endDate = Date()
     var accelerationArrData: [[Double]] = [[Double]]()
     let motionManager = CMMotionManager()
     
     func start() {
-        state = "測定中"
+        state = "running"
         if motionManager.isDeviceMotionAvailable {
             startDate = Date()
             motionManager.deviceMotionUpdateInterval = 0.1
@@ -63,7 +63,7 @@ class AccelerationSensor: NSObject, ObservableObject {
     }
     
     func stop() {
-        state = "測定終了"
+        state = "finish"
         endDate = Date()
         isStarted = false
         motionManager.stopDeviceMotionUpdates()
@@ -84,7 +84,7 @@ class AccelerationSensor: NSObject, ObservableObject {
     //多次元配列からDocuments下にCSVファイルを作る
     func saveToCsv(fileName : String, fileArrData : [[Double]]){
         let filePath = NSHomeDirectory() + "/Documents/" + fileName + ".csv"
-        var fileStrData:String = ""
+        var fileStrData:String = "x,y,z\n"
         //StringのCSV用データを準備
         for singleArray in fileArrData{
             for singleString in singleArray{
