@@ -13,6 +13,9 @@
 		5C8F68B12689DE95001BE7C2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C8F68B02689DE95001BE7C2 /* Preview Assets.xcassets */; };
 		5C8F68BC2689DE95001BE7C2 /* BicycleSupporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68BB2689DE95001BE7C2 /* BicycleSupporterTests.swift */; };
 		5C8F68C72689DE95001BE7C2 /* BicycleSupporterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68C62689DE95001BE7C2 /* BicycleSupporterUITests.swift */; };
+		5C8F68D82699A907001BE7C2 /* MotionSensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68D72699A907001BE7C2 /* MotionSensorView.swift */; };
+		5C8F68DB2699A9DF001BE7C2 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68DA2699A9DF001BE7C2 /* MapView.swift */; };
+		5C8F68DF2699DD1C001BE7C2 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68DE2699DD1C001BE7C2 /* ReportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,9 @@
 		5C8F68C22689DE95001BE7C2 /* BicycleSupporterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BicycleSupporterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C8F68C62689DE95001BE7C2 /* BicycleSupporterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BicycleSupporterUITests.swift; sourceTree = "<group>"; };
 		5C8F68C82689DE95001BE7C2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5C8F68D72699A907001BE7C2 /* MotionSensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionSensorView.swift; sourceTree = "<group>"; };
+		5C8F68DA2699A9DF001BE7C2 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		5C8F68DE2699DD1C001BE7C2 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +106,9 @@
 				5C8F68AD2689DE95001BE7C2 /* Assets.xcassets */,
 				5C8F68B22689DE95001BE7C2 /* Info.plist */,
 				5C8F68AF2689DE95001BE7C2 /* Preview Content */,
+				5C8F68D72699A907001BE7C2 /* MotionSensorView.swift */,
+				5C8F68DA2699A9DF001BE7C2 /* MapView.swift */,
+				5C8F68DE2699DD1C001BE7C2 /* ReportView.swift */,
 			);
 			path = BicycleSupporter;
 			sourceTree = "<group>";
@@ -259,7 +268,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C8F68D82699A907001BE7C2 /* MotionSensorView.swift in Sources */,
+				5C8F68DB2699A9DF001BE7C2 /* MapView.swift in Sources */,
 				5C8F68AC2689DE92001BE7C2 /* ContentView.swift in Sources */,
+				5C8F68DF2699DD1C001BE7C2 /* ReportView.swift in Sources */,
 				5C8F68AA2689DE92001BE7C2 /* BicycleSupporterApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
