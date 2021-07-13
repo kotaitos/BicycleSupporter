@@ -80,13 +80,13 @@ class MotionSensor: NSObject, ObservableObject {
     }
 
     func updateMotionData(deviceMotion: CMDeviceMotion) {
-        xAcc = String(deviceMotion.userAcceleration.x)
-        yAcc = String(deviceMotion.userAcceleration.y)
-        zAcc = String(deviceMotion.userAcceleration.z)
+        xAcc = String(round(deviceMotion.userAcceleration.x*10000)/10000)
+        yAcc = String(round(deviceMotion.userAcceleration.y*10000)/10000)
+        zAcc = String(round(deviceMotion.userAcceleration.z*10000)/10000)
         accelerationArrData.append([atof(xAcc), atof(yAcc), atof(zAcc)])
-        xGyro = String(deviceMotion.rotationRate.x)
-        yGyro = String(deviceMotion.rotationRate.y)
-        zGyro = String(deviceMotion.rotationRate.z)
+        xGyro = String(round(deviceMotion.rotationRate.x*10000)/10000)
+        yGyro = String(round(deviceMotion.rotationRate.y*10000)/10000)
+        zGyro = String(round(deviceMotion.rotationRate.z*10000)/10000)
         gyroArrData.append([atof(xGyro), atof(yGyro), atof(zGyro)])
         time += 0.1
     }

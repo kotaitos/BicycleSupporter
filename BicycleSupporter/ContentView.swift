@@ -9,24 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            TabView {
-                MapView()
-                    .tabItem {
-                        Image(systemName: "mappin.and.ellipse")
-                        Text("map")
-                    }
-                ReportView()
-                    .tabItem {
-                        Image(systemName: "doc.plaintext.fill")
-                        Text("report")
-                    }
-                MotionSensorView()
-                    .tabItem {
-                        Image(systemName: "iphone.homebutton.radiowaves.left.and.right")
-                        Text("debug")
-                    }
-            }
+        TabView {
+            MapView()
+                .tabItem {
+                    Image(systemName: "mappin.and.ellipse")
+                    Text("map")
+                }
+            ReportView()
+                .tabItem {
+                    Image(systemName: "doc.plaintext.fill")
+                    Text("report")
+                }
+            MotionSensorView()
+                .tabItem {
+                    Image(systemName: "waveform")
+                    Text("debug")
+                }
         }
     }
 }
