@@ -63,7 +63,7 @@ struct mapView : UIViewRepresentable{
         let center = CLLocationCoordinate2D(latitude: 35.6804, longitude: 139.7690)
         let span = MKCoordinateSpan(latitudeDelta: zoomValue, longitudeDelta: zoomValue)
         let region = MKCoordinateRegion(center: center, span: span)
-        map.setRegion(region, animated: true)
+        map.setRegion(region, animated: false)
         map.showsUserLocation = true
         map.setUserTrackingMode(.followWithHeading, animated: true)
         manager.delegate = context.coordinator
@@ -81,6 +81,7 @@ struct mapView : UIViewRepresentable{
         } else {
             map.setCenter(map.centerCoordinate, animated: false)
         }
+        map.setUserTrackingMode(.followWithHeading, animated: true)
     }
 
     class Coordinator: NSObject, CLLocationManagerDelegate {
