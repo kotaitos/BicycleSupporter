@@ -63,22 +63,23 @@ struct mapView : UIViewRepresentable{
         let center = CLLocationCoordinate2D(latitude: 35.6804, longitude: 139.7690)
         let span = MKCoordinateSpan(latitudeDelta: zoomValue, longitudeDelta: zoomValue)
         let region = MKCoordinateRegion(center: center, span: span)
-        map.region = region
+        map.setRegion(region, animated: true)
+        map.showsUserLocation = true
+        map.setUserTrackingMode(.followWithHeading, animated: true)
         manager.delegate = context.coordinator
         manager.startUpdatingLocation()
-        map.showsUserLocation = true
-        map.userTrackingMode = .followWithHeading
         manager.requestWhenInUseAuthorization()
         return map
     }
 
     func updateUIView(_ mapView: MKMapView, context: UIViewRepresentableContext<mapView>) {
-        let span = MKCoordinateSpan(latitudeDelta: zoomValue, longitudeDelta: zoomValue)
-        map.region.span = span
         if focus {
-            let region = MKCoordinateRegion(center: map.region.center, span: span)
-            map.region = region
-            focus = true
+            let span = MKCoordinateSpan(latitudeDelta: zoomValue, longitudeDelta: zoomValue)
+            let region = MKCoordinateRegion(center: map.userLocation.coordinate, span: span)
+            map.setRegion(region, animated: true)
+            focus = false
+        } else {
+            map.setCenter(map.centerCoordinate, animated: false)
         }
     }
 
@@ -106,12 +107,6 @@ struct mapView : UIViewRepresentable{
                 if err != nil {
                     print((err?.localizedDescription)!)
                     return
-                }
-                if self.parent.focus {
-                    let span = MKCoordinateSpan(latitudeDelta: self.parent.zoomValue, longitudeDelta: self.parent.zoomValue)
-                    let region = MKCoordinateRegion(center: location!.coordinate, span: span)
-                    self.parent.map.setRegion(region, animated: true)
-                    self.parent.focus = false
                 }
             }
         }
