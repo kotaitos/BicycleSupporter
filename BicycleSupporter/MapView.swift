@@ -67,7 +67,7 @@ struct mapView : UIViewRepresentable{
         manager.delegate = context.coordinator
         manager.startUpdatingLocation()
         map.showsUserLocation = true
-        map.userTrackingMode = .follow
+        map.userTrackingMode = .followWithHeading
         manager.requestWhenInUseAuthorization()
         return map
     }
@@ -78,8 +78,6 @@ struct mapView : UIViewRepresentable{
         if focus {
             let region = MKCoordinateRegion(center: map.region.center, span: span)
             map.region = region
-            mapView.userTrackingMode = .follow
-            mapView.showsUserLocation = true
             focus = true
         }
     }
