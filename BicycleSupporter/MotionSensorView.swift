@@ -8,7 +8,6 @@
 import SwiftUI
 import CoreMotion
 
-
 struct MotionSensorView: View {
     @ObservedObject var motionSensor = MotionSensor()
     var body: some View {
@@ -76,8 +75,8 @@ class MotionSensor: NSObject, ObservableObject {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
         let fileName = dateFormatter.string(from: startDate) + "~" + dateFormatter.string(from: endDate)
-        saveToCsv(fileName: "\(fileName).acc", fileArrData: accelerationArrData)
-        saveToCsv(fileName: "\(fileName).gyro", fileArrData: gyroArrData)
+        saveToCsv(fileName: "\(fileName)/acc", fileArrData: accelerationArrData)
+        saveToCsv(fileName: "\(fileName)/gyro", fileArrData: gyroArrData)
     }
 
     func updateMotionData(deviceMotion: CMDeviceMotion) {
@@ -114,4 +113,3 @@ class MotionSensor: NSObject, ObservableObject {
         }
     }
 }
-
