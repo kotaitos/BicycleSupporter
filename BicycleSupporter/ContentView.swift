@@ -17,7 +17,7 @@ struct ContentView: View {
                 }
             ReportView()
                 .tabItem {
-                    Image(systemName: "doc.plaintext.fill")
+                    Image(systemName: "doc.text.below.ecg")
                     Text("report")
                 }
             MotionSensorView()
