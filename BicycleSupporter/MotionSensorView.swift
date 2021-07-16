@@ -96,7 +96,7 @@ class MotionSensor: NSObject, ObservableObject {
     func saveToCsv(fileName : String, fileArrData : [[Double]]){
         // save acc data to csv
         let filePath = NSHomeDirectory() + "/Documents/" + fileName + ".csv"
-        var fileStrData:String = "acc_x,acc_y,acc_z,gyro_x,gyro_y, gyro_z\n"
+        var fileStrData:String = "x,y,z\n"
         for singleArray in fileArrData{
             for singleString in singleArray{
                 fileStrData += "\"" + String(singleString) + "\""
