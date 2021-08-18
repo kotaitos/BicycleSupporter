@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,9 +16,6 @@
 		5C8F68D82699A907001BE7C2 /* MotionSensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68D72699A907001BE7C2 /* MotionSensorView.swift */; };
 		5C8F68DB2699A9DF001BE7C2 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68DA2699A9DF001BE7C2 /* MapView.swift */; };
 		5C8F68DF2699DD1C001BE7C2 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8F68DE2699DD1C001BE7C2 /* ReportView.swift */; };
-		5CC2673A26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5CC2673926B3D5BF00737A4E /* GoogleService-Info.plist */; };
-		5CC2673B26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5CC2673926B3D5BF00737A4E /* GoogleService-Info.plist */; };
-		5CC2673C26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5CC2673926B3D5BF00737A4E /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,7 +51,6 @@
 		5C8F68D72699A907001BE7C2 /* MotionSensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionSensorView.swift; sourceTree = "<group>"; };
 		5C8F68DA2699A9DF001BE7C2 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		5C8F68DE2699DD1C001BE7C2 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
-		5CC2673926B3D5BF00737A4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +101,6 @@
 		5C8F68A82689DE92001BE7C2 /* BicycleSupporter */ = {
 			isa = PBXGroup;
 			children = (
-				5CC2673926B3D5BF00737A4E /* GoogleService-Info.plist */,
 				5C8F68A92689DE92001BE7C2 /* BicycleSupporterApp.swift */,
 				5C8F68AB2689DE92001BE7C2 /* ContentView.swift */,
 				5C8F68AD2689DE95001BE7C2 /* Assets.xcassets */,
@@ -249,7 +244,6 @@
 			files = (
 				5C8F68B12689DE95001BE7C2 /* Preview Assets.xcassets in Resources */,
 				5C8F68AE2689DE95001BE7C2 /* Assets.xcassets in Resources */,
-				5CC2673A26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,7 +251,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CC2673B26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,7 +258,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CC2673C26B3D5BF00737A4E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
