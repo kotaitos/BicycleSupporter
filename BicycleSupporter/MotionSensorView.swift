@@ -55,6 +55,9 @@ struct MotionSensorView: View {
                 self.motionSensor.isStarted ? Text("STOP").padding() : Text("START").padding()
             }
             .disabled(motionSensor.experimentName.isEmpty)
+            Button(action: {self.motionSensor.clear()}, label: {
+                Text("CLEAR").padding()
+            })
         }
     }
 }
@@ -89,6 +92,31 @@ class MotionSensor: NSObject, ObservableObject {
     var gravArrData: [[Double]] = [[Double]]()
     var attArrData: [[Double]] = [[Double]]()
     let motionManager = CMMotionManager()
+    
+    func clear() {
+        self.isStarted = false
+        self.xAcc = "0.0"
+        self.yAcc = "0.0"
+        self.zAcc = "0.0"
+        self.xGyro = "0.0"
+        self.yGyro = "0.0"
+        self.zGyro = "0.0"
+        self.xGrav = "0.0"
+        self.yGrav = "0.0"
+        self.zGrav = "0.0"
+        self.xAtt = "0.0"
+        self.yAtt = "0.0"
+        self.zAtt = "0.0"
+        self.time = 0.0
+        self.state = "waiting"
+        self.experimentName = ""
+        self.startDate = Date()
+        self.endDate = Date()
+        self.accelerationArrData = [[Double]]()
+        self.gyroArrData = [[Double]]()
+        self.gravArrData = [[Double]]()
+        self.attArrData = [[Double]]()
+    }
     
     func start() {
         self.experimentName = experimentName
