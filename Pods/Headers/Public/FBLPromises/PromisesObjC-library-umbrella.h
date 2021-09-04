@@ -1,1 +1,0 @@
-../../../Target Support Files/PromisesObjC-library/PromisesObjC-library-umbrella.h

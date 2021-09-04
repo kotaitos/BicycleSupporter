@@ -1,6 +1,0 @@
-framework module Pods_BicycleSupporter_BicycleSupporterUITests {
-  umbrella header "Pods-BicycleSupporter-BicycleSupporterUITests-umbrella.h"
-
-  export *
-  module * { export * }
-}

@@ -1,1 +1,0 @@
-../../../Target Support Files/FirebaseInstallations-library/FirebaseInstallations-library-umbrella.h
