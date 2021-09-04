@@ -1,0 +1,1 @@
+../../../Target Support Files/FirebaseFirestoreSwift-library/FirebaseFirestoreSwift-library-umbrella.h

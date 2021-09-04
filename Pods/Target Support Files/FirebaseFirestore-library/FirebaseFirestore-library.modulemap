@@ -1,0 +1,6 @@
+module FirebaseFirestore {
+  umbrella header "FirebaseFirestore-library-umbrella.h"
+
+  export *
+  module * { export * }
+}

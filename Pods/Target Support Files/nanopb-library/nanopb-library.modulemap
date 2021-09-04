@@ -1,0 +1,6 @@
+module nanopb {
+  umbrella header "nanopb-library-umbrella.h"
+
+  export *
+  module * { export * }
+}

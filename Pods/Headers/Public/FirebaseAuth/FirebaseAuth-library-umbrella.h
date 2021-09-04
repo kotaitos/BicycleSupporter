@@ -1,0 +1,1 @@
+../../../Target Support Files/FirebaseAuth-library/FirebaseAuth-library-umbrella.h

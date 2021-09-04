@@ -1,0 +1,6 @@
+module FirebaseFirestoreSwift {
+  umbrella header "FirebaseFirestoreSwift-library-umbrella.h"
+
+  export *
+  module * { export * }
+}

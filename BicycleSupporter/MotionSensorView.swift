@@ -7,6 +7,9 @@
 
 import SwiftUI
 import CoreMotion
+import FirebaseFirestore
+import FirebaseStorage
+
 
 struct MotionSensorView: View {
     @ObservedObject var motionSensor = MotionSensor()
@@ -69,6 +72,8 @@ struct MotionSensorView_Previews: PreviewProvider {
 }
 
 class MotionSensor: NSObject, ObservableObject {
+    private var db = Firestore.firestore()
+    private var storage = Storage.storage(url: "gs://bicycle-supporter.appspot.com")
     @Published var isStarted = false
     @Published var xAcc = "0.0"
     @Published var yAcc = "0.0"
@@ -124,6 +129,7 @@ class MotionSensor: NSObject, ObservableObject {
             state = "running"
             startDate = Date()
             motionManager.deviceMotionUpdateInterval = 0.1
+            motionManager.showsDeviceMovementDisplay = true
             motionManager.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: {(motion:CMDeviceMotion?, error:Error?) in
                 self.updateMotionData(deviceMotion: motion!)
             })
@@ -140,10 +146,8 @@ class MotionSensor: NSObject, ObservableObject {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
         let fileName = self.experimentName + "_" + dateFormatter.string(from: startDate) + "~" + dateFormatter.string(from: endDate)
-        saveToLocalCsv(fileName: "\(fileName)-acc", fileArrData: accelerationArrData)
-        saveToLocalCsv(fileName: "\(fileName)-gyro", fileArrData: gyroArrData)
-        saveToLocalCsv(fileName: "\(fileName)-grav", fileArrData: gravArrData)
-        saveToLocalCsv(fileName: "\(fileName)-att", fileArrData: attArrData)
+        let csvRootPath = uploadToFirestore()
+        uploadLocalfileToFirestorage(csvRootPath: csvRootPath)
     }
 
     func updateMotionData(deviceMotion: CMDeviceMotion) {
@@ -166,25 +170,130 @@ class MotionSensor: NSObject, ObservableObject {
         time += 0.1
     }
     
-    //多次元配列からDocuments下にCSVファイルを作る
-    func saveToLocalCsv(fileName : String, fileArrData : [[Double]]){
-        // save acc data to csv
-        let filePath = NSHomeDirectory() + "/Documents/" + fileName + ".csv"
-        var fileStrData:String = "x,y,z\n"
-        for singleArray in fileArrData{
+    func uploadToFirestore() -> String{
+        let document = db.collection("experiment").document()
+        let csvRootPath = "experiment/\(document.documentID)/"
+        document.setData([
+            "name": self.experimentName,
+            "lastUpdatedAt": FieldValue.serverTimestamp(),
+            "startAt": Timestamp(date: self.startDate),
+            "duration": Double(self.accelerationArrData.count) / 10.0,
+            "csvRootUrl": csvRootPath
+        ]){ err in
+            if let err = err {
+                self.state = "Error writing document: \(err)"
+            } else {
+                self.state = "Document successfully written!"
+            }
+        }
+        return csvRootPath
+    }
+    
+    func uploadLocalfileToFirestorage(csvRootPath: String){
+        let storageRef = storage.reference()
+        
+        // acc
+        var accStr:String = "x,y,z\n"
+        for singleArray in self.accelerationArrData{
             for singleString in singleArray{
-                fileStrData += "\"" + String(singleString) + "\""
+                accStr += "\"" + String(singleString) + "\""
                 if singleString != singleArray[singleArray.count-1]{
-                    fileStrData += ","
+                    accStr += ","
                 }
             }
-            fileStrData += "\n"
+            accStr += "\n"
         }
-        do{
-            try fileStrData.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
-            state = "Success to Wite the File"
-        }catch let error as NSError{
-            state = "Failure to Write File\n\(error)"
+        let accCsvRef = storageRef.child("\(csvRootPath)acc.csv")
+        let _ = accCsvRef.putData(Data(accStr.utf8), metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            self.state = "Error1 uploading acc file."
+            return
+          }
+          let _ = metadata.size
+            accCsvRef.downloadURL { (url, error) in
+            guard let _ = url else {
+                self.state = "Error2 uploading acc file."
+              return
+            }
+          }
+        }
+        
+        // gyro
+        var gyroStr:String = "x,y,z\n"
+        for singleArray in self.gyroArrData{
+            for singleString in singleArray{
+                gyroStr += "\"" + String(singleString) + "\""
+                if singleString != singleArray[singleArray.count-1]{
+                    gyroStr += ","
+                }
+            }
+            gyroStr += "\n"
+        }
+        let gyroCsvRef = storageRef.child("\(csvRootPath)gyro.csv")
+        let _ = gyroCsvRef.putData(Data(gyroStr.utf8), metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            self.state = "Error1 uploading gyro file."
+            return
+          }
+          let _ = metadata.size
+            gyroCsvRef.downloadURL { (url, error) in
+            guard let _ = url else {
+                self.state = "Error2 uploading gyro file."
+              return
+            }
+          }
+        }
+        
+        // grav
+        var gravStr:String = "x,y,z\n"
+        for singleArray in self.gravArrData{
+            for singleString in singleArray{
+                gravStr += "\"" + String(singleString) + "\""
+                if singleString != singleArray[singleArray.count-1]{
+                    gravStr += ","
+                }
+            }
+            gravStr += "\n"
+        }
+        let gravCsvRef = storageRef.child("\(csvRootPath)grav.csv")
+        let _ = gravCsvRef.putData(Data(gravStr.utf8), metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            self.state = "Error1 uploading grav file."
+            return
+          }
+          let _ = metadata.size
+            gravCsvRef.downloadURL { (url, error) in
+            guard let _ = url else {
+                self.state = "Error2 uploading grav file."
+              return
+            }
+          }
+        }
+        
+        // att
+        var attStr:String = "x,y,z\n"
+        for singleArray in self.attArrData{
+            for singleString in singleArray{
+                attStr += "\"" + String(singleString) + "\""
+                if singleString != singleArray[singleArray.count-1]{
+                    attStr += ","
+                }
+            }
+            attStr += "\n"
+        }
+        let attCsvRef = storageRef.child("\(csvRootPath)att.csv")
+        let _ = attCsvRef.putData(Data(attStr.utf8), metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            self.state = "Error1 uploading att file."
+            return
+          }
+          let _ = metadata.size
+            attCsvRef.downloadURL { (url, error) in
+            guard let _ = url else {
+                self.state = "Error2 uploading att file."
+              return
+            }
+          }
         }
     }
 }

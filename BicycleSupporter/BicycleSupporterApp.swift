@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct BicycleSupporterApp: App {
@@ -13,5 +14,9 @@ struct BicycleSupporterApp: App {
         WindowGroup {
             ContentView()
         }
+    }
+    
+    init(){
+        FirebaseApp.configure()
     }
 }
