@@ -90,12 +90,14 @@ class MotionSensor: NSObject, ObservableObject {
     @Published var time = 0.0
     @Published var state = "waiting"
     @Published var experimentName = ""
+    var sensors:[String: [[Double]]] = [
+        "acc": [[Double]]([[0.0, 0.0, 0.0]]),
+        "gyro": [[Double]]([[0.0, 0.0, 0.0]]),
+        "grav": [[Double]]([[0.0, 0.0, 0.0]]),
+        "att": [[Double]]([[0.0, 0.0, 0.0]])
+    ]
     var startDate = Date()
     var endDate = Date()
-    var accelerationArrData: [[Double]] = [[Double]]()
-    var gyroArrData: [[Double]] = [[Double]]()
-    var gravArrData: [[Double]] = [[Double]]()
-    var attArrData: [[Double]] = [[Double]]()
     let motionManager = CMMotionManager()
     
     func clear() {
@@ -117,10 +119,12 @@ class MotionSensor: NSObject, ObservableObject {
         self.experimentName = ""
         self.startDate = Date()
         self.endDate = Date()
-        self.accelerationArrData = [[Double]]()
-        self.gyroArrData = [[Double]]()
-        self.gravArrData = [[Double]]()
-        self.attArrData = [[Double]]()
+        self.sensors = [
+            "acc": [[Double]]([[0.0, 0.0, 0.0]]),
+            "gyro": [[Double]]([[0.0, 0.0, 0.0]]),
+            "grav": [[Double]]([[0.0, 0.0, 0.0]]),
+            "att": [[Double]]([[0.0, 0.0, 0.0]])
+        ]
     }
     
     func start() {
@@ -143,30 +147,37 @@ class MotionSensor: NSObject, ObservableObject {
         endDate = Date()
         isStarted = false
         motionManager.stopDeviceMotionUpdates()
+        
+        // save to firebase
+        let csvRootPath = uploadToFirestore()
+        uploadLocalfileToFirestorage(csvRootPath: csvRootPath)
+        
+        // save to local
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
         let fileName = self.experimentName + "_" + dateFormatter.string(from: startDate) + "~" + dateFormatter.string(from: endDate)
-        let csvRootPath = uploadToFirestore()
-        uploadLocalfileToFirestorage(csvRootPath: csvRootPath)
+        for (sensorName, sensorArr) in self.sensors {
+            saveToLocalCsv(fileName: "\(fileName)-\(sensorName)", fileArrData: sensorArr)
+        }
     }
 
     func updateMotionData(deviceMotion: CMDeviceMotion) {
-        xAcc = String(deviceMotion.userAcceleration.x)
-        yAcc = String(deviceMotion.userAcceleration.y)
-        zAcc = String(deviceMotion.userAcceleration.z)
-        accelerationArrData.append([atof(xAcc), atof(yAcc), atof(zAcc)])
-        xGyro = String(deviceMotion.rotationRate.x)
-        yGyro = String(deviceMotion.rotationRate.y)
-        zGyro = String(deviceMotion.rotationRate.z)
-        gyroArrData.append([atof(xGyro), atof(yGyro), atof(zGyro)])
-        xGrav = String(deviceMotion.gravity.x)
-        yGrav = String(deviceMotion.gravity.y)
-        zGrav = String(deviceMotion.gravity.z)
-        gravArrData.append([atof(xGrav), atof(yGrav), atof(zGrav)])
-        xAtt = String(deviceMotion.attitude.pitch)
-        yAtt = String(deviceMotion.attitude.roll)
-        zAtt = String(deviceMotion.attitude.yaw)
-        attArrData.append([atof(xAtt), atof(yAtt), atof(zAtt)])
+        self.xAcc = String(deviceMotion.userAcceleration.x)
+        self.yAcc = String(deviceMotion.userAcceleration.y)
+        self.zAcc = String(deviceMotion.userAcceleration.z)
+        self.sensors["acc"]!.append([atof(self.xAcc), atof(self.yAcc), atof(self.zAcc)])
+        self.xGyro = String(deviceMotion.rotationRate.x)
+        self.yGyro = String(deviceMotion.rotationRate.y)
+        self.zGyro = String(deviceMotion.rotationRate.z)
+        self.sensors["gyro"]!.append([atof(self.xGyro), atof(self.yGyro), atof(self.zGyro)])
+        self.xGrav = String(deviceMotion.gravity.x)
+        self.yGrav = String(deviceMotion.gravity.y)
+        self.zGrav = String(deviceMotion.gravity.z)
+        self.sensors["grav"]!.append([atof(self.xGrav), atof(self.yGrav), atof(self.zGrav)])
+        self.xAtt = String(deviceMotion.attitude.pitch)
+        self.yAtt = String(deviceMotion.attitude.roll)
+        self.zAtt = String(deviceMotion.attitude.yaw)
+        self.sensors["att"]!.append([atof(self.xAtt), atof(self.yAtt), atof(self.zAtt)])
         time += 0.1
     }
     
@@ -177,7 +188,7 @@ class MotionSensor: NSObject, ObservableObject {
             "name": self.experimentName,
             "lastUpdatedAt": FieldValue.serverTimestamp(),
             "startAt": Timestamp(date: self.startDate),
-            "duration": Double(self.accelerationArrData.count) / 10.0,
+            "duration": Double(self.sensors["acc"]!.count) / 10.0,
             "csvRootUrl": csvRootPath
         ]){ err in
             if let err = err {
@@ -191,109 +202,53 @@ class MotionSensor: NSObject, ObservableObject {
     
     func uploadLocalfileToFirestorage(csvRootPath: String){
         let storageRef = storage.reference()
-        
-        // acc
-        var accStr:String = "x,y,z\n"
-        for singleArray in self.accelerationArrData{
+        for (sensorName, sensorArr) in self.sensors {
+            var csvStr:String = "x,y,z\n"
+            for singleArray in sensorArr{
+                for singleString in singleArray{
+                    csvStr += "\"" + String(singleString) + "\""
+                    if singleString != singleArray[singleArray.count-1]{
+                        csvStr += ","
+                    }
+                }
+                csvStr += "\n"
+            }
+            let csvRef = storageRef.child("\(csvRootPath)\(sensorName).csv")
+            let _ = csvRef.putData(Data(csvStr.utf8), metadata: nil) { metadata, error in
+              guard let metadata = metadata else {
+                self.state = "Error1 uploading \(sensorName) file."
+                return
+              }
+              let _ = metadata.size
+                csvRef.downloadURL { (url, error) in
+                guard let _ = url else {
+                    self.state = "Error2 uploading \(sensorName) file."
+                  return
+                }
+              }
+            }
+        }
+        self.state = "Success uploading csv files."
+    }
+    
+    func saveToLocalCsv(fileName : String, fileArrData : [[Double]]){
+        // save acc data to csv
+        let filePath = NSHomeDirectory() + "/Documents/" + fileName + ".csv"
+        var fileStrData:String = "x,y,z\n"
+        for singleArray in fileArrData{
             for singleString in singleArray{
-                accStr += "\"" + String(singleString) + "\""
+                fileStrData += "\"" + String(singleString) + "\""
                 if singleString != singleArray[singleArray.count-1]{
-                    accStr += ","
+                    fileStrData += ","
                 }
             }
-            accStr += "\n"
+            fileStrData += "\n"
         }
-        let accCsvRef = storageRef.child("\(csvRootPath)acc.csv")
-        let _ = accCsvRef.putData(Data(accStr.utf8), metadata: nil) { metadata, error in
-          guard let metadata = metadata else {
-            self.state = "Error1 uploading acc file."
-            return
-          }
-          let _ = metadata.size
-            accCsvRef.downloadURL { (url, error) in
-            guard let _ = url else {
-                self.state = "Error2 uploading acc file."
-              return
-            }
-          }
-        }
-        
-        // gyro
-        var gyroStr:String = "x,y,z\n"
-        for singleArray in self.gyroArrData{
-            for singleString in singleArray{
-                gyroStr += "\"" + String(singleString) + "\""
-                if singleString != singleArray[singleArray.count-1]{
-                    gyroStr += ","
-                }
-            }
-            gyroStr += "\n"
-        }
-        let gyroCsvRef = storageRef.child("\(csvRootPath)gyro.csv")
-        let _ = gyroCsvRef.putData(Data(gyroStr.utf8), metadata: nil) { metadata, error in
-          guard let metadata = metadata else {
-            self.state = "Error1 uploading gyro file."
-            return
-          }
-          let _ = metadata.size
-            gyroCsvRef.downloadURL { (url, error) in
-            guard let _ = url else {
-                self.state = "Error2 uploading gyro file."
-              return
-            }
-          }
-        }
-        
-        // grav
-        var gravStr:String = "x,y,z\n"
-        for singleArray in self.gravArrData{
-            for singleString in singleArray{
-                gravStr += "\"" + String(singleString) + "\""
-                if singleString != singleArray[singleArray.count-1]{
-                    gravStr += ","
-                }
-            }
-            gravStr += "\n"
-        }
-        let gravCsvRef = storageRef.child("\(csvRootPath)grav.csv")
-        let _ = gravCsvRef.putData(Data(gravStr.utf8), metadata: nil) { metadata, error in
-          guard let metadata = metadata else {
-            self.state = "Error1 uploading grav file."
-            return
-          }
-          let _ = metadata.size
-            gravCsvRef.downloadURL { (url, error) in
-            guard let _ = url else {
-                self.state = "Error2 uploading grav file."
-              return
-            }
-          }
-        }
-        
-        // att
-        var attStr:String = "x,y,z\n"
-        for singleArray in self.attArrData{
-            for singleString in singleArray{
-                attStr += "\"" + String(singleString) + "\""
-                if singleString != singleArray[singleArray.count-1]{
-                    attStr += ","
-                }
-            }
-            attStr += "\n"
-        }
-        let attCsvRef = storageRef.child("\(csvRootPath)att.csv")
-        let _ = attCsvRef.putData(Data(attStr.utf8), metadata: nil) { metadata, error in
-          guard let metadata = metadata else {
-            self.state = "Error1 uploading att file."
-            return
-          }
-          let _ = metadata.size
-            attCsvRef.downloadURL { (url, error) in
-            guard let _ = url else {
-                self.state = "Error2 uploading att file."
-              return
-            }
-          }
+        do{
+            try fileStrData.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
+            state = "Success to Wite the File"
+        }catch let error as NSError{
+            state = "Failure to Write File\n\(error)"
         }
     }
 }
