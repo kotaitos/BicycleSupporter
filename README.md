@@ -1,4 +1,4 @@
-# BicycleSupporter
+# Swift sensor data collect app
 卒業研究実験用アプリケーション
 
 ## 見た目
